@@ -54,7 +54,7 @@ int main(){
 	nodelay(stdscr,TRUE); //ch will be 'ERR' if no character clicked
 	
 	printw("Starting Now - Press 'q' to Quit\n");
-	while((ch = getch()) != 'q'){
+	while((ch = getch()) != 'r'){
 	/*	softPwmWrite(PWMA,0); //Everything starts off
 		digitalWrite(AIN1,LOW);
 		digitalWrite(AIN2,LOW);
@@ -84,7 +84,17 @@ int main(){
 			digitalWrite(AIN2,LOW);
 			softPwmWrite(PWMB,0);
 			digitalWrite(BIN1,LOW);
-			digitalWrite(BIN2,LOW);
+			digitalWrite(BIN2,LOW);		
+		} else if(ch == 'e'){ //Turning forward-right
+			softPwmWrite(PWMA,pwmVal);
+			digitalWrite(AIN2,HIGH);
+			softPwmWrite(PWMB,pwmVal/4*3);
+			digitalWrite(BIN1,HIGH);
+		} else if(ch == 'q'){ //Turning forward-left
+			softPwmWrite(PWMA,pwmVal/4*3);
+			digitalWrite(AIN2,HIGH);
+			softPwmWrite(PWMB,pwmVal);
+			digitalWrite(BIN1,HIGH);
 		} else { //Invalid Key
 			printw("Invalid Key\n");
 		}
