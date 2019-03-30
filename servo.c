@@ -1,42 +1,41 @@
 #include <wiringPi.h>
 #include <stdio.h>
+#include <softPwm.h>
+
+#define SERVO 18
+
+long map(long value, long fromLow,long fromHigh, long toLow, long toHigh){
+	return (toHigh-toLow)*(value-fromLow)/(fromHigh-fromLow)+toLow;
+}
+
+void servoWrite(int angle){
+	if(angle > 180){
+		angle = 180;
+	}
+	if(angle < 0){
+		angle = 0;
+	}
+	softPwmWrite(SERVO,map(angle,0,180,7,23));
+}
+
 
 int main(void){
 	wiringPiSetupGpio();
-	pinMode(18,PWM_OUTPUT);
-	int val = 75;
-
-/*	printf("Starting now\n");
-	pwmWrite(18,val);
-	delay(30000); //30sec
-	printf("Ending now\n");*/
-while(1){
-for(int i = 0;i<=1025;i++){
-	pwmWrite(18,i);
-	printf("%d\n",i);
-	delay(100);
-}
-for(int i = 1025;i>=0;i--){
-	pwmWrite(18,i);
-	printf("%d\n",i);
-	delay(100);
-}
-}
-
+	softPwmCreate(SERVO,0,200);
 
 	while(1){
-		printf("Right");
-		pwmWrite(18,val-(val/2)); //138-140 bigger the number more CW speed
+		printf("Clockwise\n");
+		for(int i = 0;i<180;i+=2){
+			servoWrite(i);
+			delay(10);
+		}
+		printf("Counterclockwise\n");
+		for(int i = 180;i>0;i-=2){
+			servoWrite(i);
+			delay(10);
+		}
+		printf("Finish, resting\n");
 		delay(1000);
-		printf("Left");
-		pwmWrite(18,val+(val/2));
-		delay(1000);
-
-/*		for(int val = 525;val < 1024;val = val+10){
-			printf("%d\n",val);
-			pwmWrite(18,val);
-			delay(1000);
-		}*/
 	}
 	return 0;
 }

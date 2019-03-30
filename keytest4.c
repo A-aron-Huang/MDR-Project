@@ -19,7 +19,7 @@
 
 #define BIN1 14 //Right Motor Controls
 #define BIN2 15
-#define PWMB 18
+#define PWMB 23
 
 int main(){
 	int ch; //Used to save a temp character variable
