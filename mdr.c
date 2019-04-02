@@ -1,6 +1,6 @@
 /* Notes:
- * Final Project Code
- * Check pulsing
+ *
+ *
  *
  */
 
@@ -25,8 +25,16 @@
 #define SERVO_MAX_MS 20+OFFSET_MS //define the pulse duration for maximum angle of servo
 #define SERVO 18 //define the GPIO number connected to servo
 
-//Pulse Pin for Camera
-#define PULSE 25
+//LED Light up
+#define LED1 25
+#define LED2 8
+#define LED3 9
+#define LED4 11
+
+//Camera
+#define TAKE 19 //Outputs into pin 26
+#define SEND 20 //Outputs into pin 16
+
 
 //Formulas
 long map(long value,long fromLow,long fromHigh,long toLow,long toHigh) {
@@ -41,12 +49,24 @@ void servoWrite(int angle) { //Specify a certain rotation angle (0-180) for the 
     softPwmWrite(SERVO,map(angle,0,180,SERVO_MIN_MS,SERVO_MAX_MS));
 }
 
-void pulseCount(int delayTime, int *count) { //Subtract a specified time in ms from a counter
-    *count-=delayTime;
-    if(*count < 0) {
-        digitalWrite(PULSE,LOW);
-        *count = 0;
+void pulseCounter(int delayTime, int *LEDcount) { //Subtract a specified time in ms from a counter
+    *LEDcount-=delayTime;
+    if(*LEDcount < 0) {
+        digitalWrite(LED1,LOW);
+		digitalWrite(LED2,LOW);
+		digitalWrite(LED3,LOW);
+		digitalWrite(LED4,LOW);
+        *LEDcount = 0;
     }
+}
+
+void cameraCounter(int delayTime, int *cameraCount){
+	*cameraCount-=delayTime;
+	if(*cameraCount<0){
+		digitalWrite(TAKE,LOW);
+		digitalWrite(SEND,LOW);
+		*cameraCount = 0;
+	}
 }
 
 //Start of Code
@@ -58,13 +78,16 @@ int main() {
     int pwmVal = 100; //Value for max PWM range**
     int delayTime = 35;
 
-    //Pulse Variable
-    int count = 0;
+    //LED Variable
+    int LEDCount = 0;
+
+	//Camera Variable
+	int cameraCount = 0;
 
     //Servo Variables
-    int rotateVal = 2; //Used to rotate car back and forth
-    int pos = 90; //Starting position of car
-    servoWrite(pos);
+    int pos = 80; //Starting position of car, should be 90 prob offset
+	int rotateVal = 2; //Rotates how many times per activation
+	int servoDelay = 13; //ms delay
 
     //Setting Up Wiring of Board
     wiringPiSetupGpio();
@@ -85,10 +108,23 @@ int main() {
 
     //Setting Up servo with period of 2000us - Datasheet
     softPwmCreate(SERVO,  0, 200); //Servo
+	servoWrite(pos);
 
     //Setting Up Pulse
-    pinMode(PULSE,OUTPUT);
-    digitalWrite(PULSE,LOW);
+    pinMode(LED1,OUTPUT);
+	pinMode(LED2,OUTPUT);
+	pinMode(LED3,OUTPUT);
+	pinMode(LED4,OUTPUT);
+	digitalWrite(LED1,LOW);
+	digitalWrite(LED2,LOW);
+	digitalWrite(LED3,LOW);
+	digitalWrite(LED4,LOW);
+
+	//Setting up the Camera
+	pinMode(SEND,OUTPUT);
+	digitalWrite(SEND,LOW);
+	pinMode(TAKE,OUTPUT);
+	digitalWrite(TAKE,LOW);
 
     initscr(); //Intilaizing keypressing
     raw();
@@ -106,11 +142,15 @@ int main() {
 	printw("E - Turn Forward-Right\n");
 	printw("\nServo Keys:\n");
     printw("Up Key - Rotate the Servo Arm\n");
-    printw("Down key - Stop roatating arm\n");
-	printw("\nCamera/Pulse\n");
-	printw("P - Take a picture\n");
-	printw("\nOthers\n");
-    printw("Space - Exit Program\n");
+    printw("Down key - Stop Rotating Rrm\n");
+	printw("Left Key - Rotate Left\n");
+	printw("Right Key - Rotate Right\n");
+	printw("\nCamera/Pulse:\n");;
+	printw("C - Take a picture (Wait 4 seconds)\n");
+	printw("X - Send a picture\n");
+	printw("\nOthers:\n");
+	printw("P - Party Bus\n");
+    printw("Space - Exit Program\n\n");
     while((ch = getch()) != ' ') {
         if(ch == 'w') { //Going forward
             softPwmWrite(PWMA,pwmVal);
@@ -140,17 +180,40 @@ int main() {
             digitalWrite(BIN1,HIGH);
         } else if(ch == KEY_UP) {
             while((ch = getch()) != KEY_DOWN) {
+				if(ch == ' '){
+					break;
+				}
                 servoWrite(pos);
                 pos = pos + rotateVal;
                 if(pos >= 180 || pos <= 0) { //Flips in opposite direction
                     rotateVal = -1*rotateVal;
                 }
-                pulseCount(20,&count);
-                delay(20);
+                pulseCounter(servoDelay,&LEDCount);
+				cameraCounter(servoDelay,&cameraCount);
+                delay(servoDelay);
             }
+		} else if (ch == KEY_RIGHT){
+			if(pos > 10){
+				pos-=7;
+				servoWrite(pos);
+			}
+		} else if (ch == KEY_LEFT){
+			if(pos < 170){
+				pos+=7;
+				servoWrite(pos);
+			}
+		} else if (ch == 'c') { //Capture
+			cameraCount = 3000;
+			digitalWrite(TAKE,HIGH);
+		} else if (ch == 'x'){	//Send
+			cameraCount = 3000;
+			digitalWrite(SEND,HIGH);
         } else if (ch == 'p') {
-            count = 3000;
-            digitalWrite(PULSE,HIGH);
+            LEDCount = 5000;
+            digitalWrite(LED1,HIGH);
+			digitalWrite(LED2,HIGH);
+			digitalWrite(LED3,HIGH);
+			digitalWrite(LED4,HIGH);
         } else if (ch == ERR) {
             softPwmWrite(PWMA,0); //Everything starts off
             digitalWrite(AIN1,LOW);
@@ -162,13 +225,15 @@ int main() {
             printw("Invalid Key\n");
         }
 
-        pulseCount(delayTime,&count);
+		cameraCounter(delayTime,&cameraCount);
+        pulseCounter(delayTime,&LEDCount);
         delay(delayTime);
     }
     //While loop has been exited
-    servoWrite(90); //Go back to original position
+    servoWrite(80); //Go back to original position
     digitalWrite(STBY,LOW); //Turn the car off
     printw("\nTurning Off!\n"); //Deintialize keypressing
+	delay(500);
     refresh();
     getch();
     endwin();
