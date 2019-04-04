@@ -17,7 +17,7 @@
 #define AIN2 4
 #define BIN1 14 //Right Motor Controls
 #define BIN2 15
-#define PWMB 23
+#define PWMB 24
 
 //Servo Values From Data Sheet
 #define OFFSET_MS 3 //Define the unit of servo pulse offset: 0.3ms
@@ -26,10 +26,12 @@
 #define SERVO 18 //define the GPIO number connected to servo
 
 //LED Light up
-#define LED1 25
-#define LED2 8
-#define LED3 9
-#define LED4 11
+#define LED1 9
+#define LED2 11
+#define LED3 22
+#define LED4 25
+#define LED5 8
+#define LED6 23
 
 //Camera
 #define TAKE 19 //Outputs into pin 26
@@ -56,6 +58,8 @@ void pulseCounter(int delayTime, int *LEDcount) { //Subtract a specified time in
 		digitalWrite(LED2,LOW);
 		digitalWrite(LED3,LOW);
 		digitalWrite(LED4,LOW);
+		digitalWrite(LED5,LOW);
+		digitalWrite(LED6,LOW);
         *LEDcount = 0;
     }
 }
@@ -115,10 +119,14 @@ int main() {
 	pinMode(LED2,OUTPUT);
 	pinMode(LED3,OUTPUT);
 	pinMode(LED4,OUTPUT);
+	pinMode(LED5,OUTPUT);
+	pinMode(LED6,OUTPUT);
 	digitalWrite(LED1,LOW);
 	digitalWrite(LED2,LOW);
 	digitalWrite(LED3,LOW);
 	digitalWrite(LED4,LOW);
+	digitalWrite(LED5,LOW);
+	digitalWrite(LED6,LOW);
 
 	//Setting up the Camera
 	pinMode(SEND,OUTPUT);
@@ -141,8 +149,8 @@ int main() {
 	printw("Q - Turn Forward-Left\n");
 	printw("E - Turn Forward-Right\n");
 	printw("\nServo Keys:\n");
-    printw("Up Key - Rotate the Servo Arm\n");
-    printw("Down key - Stop Rotating Rrm\n");
+    printw("Up Key - Auto Mode (Rotate Arm Automatically)\n");
+    printw("Down key - Manual Mode (Rotate Arm with Left and Right Key)\n");
 	printw("Left Key - Rotate Left\n");
 	printw("Right Key - Rotate Right\n");
 	printw("\nCamera/Pulse:\n");;
@@ -170,12 +178,12 @@ int main() {
             digitalWrite(BIN1,HIGH);
         } else if(ch == 'q') { //Turing Forward left
             softPwmWrite(PWMB,pwmVal);
-            softPwmWrite(PWMA,pwmVal*0.75);
+            softPwmWrite(PWMA,pwmVal*0.85);
             digitalWrite(BIN1,HIGH);
             digitalWrite(AIN2,HIGH);
         } else if(ch == 'e') { //Turning Forward right
             softPwmWrite(PWMA,pwmVal);
-            softPwmWrite(PWMB,pwmVal*0.75);
+            softPwmWrite(PWMB,pwmVal*0.85);
             digitalWrite(AIN2,HIGH);
             digitalWrite(BIN1,HIGH);
         } else if(ch == KEY_UP) {
@@ -214,6 +222,8 @@ int main() {
 			digitalWrite(LED2,HIGH);
 			digitalWrite(LED3,HIGH);
 			digitalWrite(LED4,HIGH);
+			digitalWrite(LED5,HIGH);
+			digitalWrite(LED6,HIGH);
         } else if (ch == ERR) {
             softPwmWrite(PWMA,0); //Everything starts off
             digitalWrite(AIN1,LOW);
