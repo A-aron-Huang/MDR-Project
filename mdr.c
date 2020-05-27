@@ -1,10 +1,3 @@
-/* Notes:
- *
- *
- *
- */
-
-
 #include <ncurses.h>	//Used to set up keyboard commands
 #include <wiringPi.h>	//Used to setup GPIO pins
 #include <stdio.h>		//Used just in general

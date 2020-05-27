@@ -2,6 +2,7 @@ from datetime import datetime
 import matplotlib.pylot as pyplot
 import RPi.GPIO as GPIO
 
+
 RECEIVED_SIGNAL = [[],[]] #[[time of reading], [signal reading]]
 MAX_DURATION = 5
 RECEIVE_PIN 24

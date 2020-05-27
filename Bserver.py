@@ -1,5 +1,6 @@
 import bluetooth #From PyBluez library
 
+
 serverAddress = 'B8:27:EB:D7:1B:CE'#Address of server
 port = 1#port client connects too
 backlog = 1

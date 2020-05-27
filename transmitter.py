@@ -2,6 +2,7 @@ import time
 import sys
 import RPi.GPIO as GPIO
 
+
 a_on = '1111111111111010101011101'
 a_off = '1111111111111010101010111'
 b_on = '1111111111101110101011101'
