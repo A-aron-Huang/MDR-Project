@@ -1,6 +1,6 @@
 #include <ncurses.h>  //Used to set up keyboard commands
 #include <wiringPi.h> //Used to setup GPIO pins
-#include <stdio.h>    //Used just in general
+#include <stdio.h>    //Used for input/output commands
 #include <softPwm.h>  //Used as alternative PWM
 
 //Assigned Car Pins
@@ -14,9 +14,9 @@
 
 //Servo Values From Data Sheet
 #define OFFSET_MS 3                 //Define the unit of servo pulse offset: 0.3ms
-#define SERVO_MIN_MS 10 - OFFSET_MS //define the pulse duration for minimum angle of servo
-#define SERVO_MAX_MS 20 + OFFSET_MS //define the pulse duration for maximum angle of servo
-#define SERVO 18                    //define the GPIO number connected to servo
+#define SERVO_MIN_MS 10 - OFFSET_MS //Define the pulse duration for minimum angle of servo
+#define SERVO_MAX_MS 20 + OFFSET_MS //Define the pulse duration for maximum angle of servo
+#define SERVO 18                    //Define the GPIO number connected to servo
 
 //LED Light up
 #define LED1 9
