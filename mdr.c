@@ -153,7 +153,6 @@ int main()
     printw("Left Key - Rotate Left\n");
     printw("Right Key - Rotate Right\n");
     printw("\nCamera/Pulse:\n");
-    ;
     printw("C - Take a picture (Wait 4 seconds)\n");
     printw("X - Send a picture\n");
     printw("\nOthers:\n");
